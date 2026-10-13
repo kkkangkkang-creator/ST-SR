@@ -12,7 +12,7 @@
 .sr-history-reasoning { white-space:pre-wrap; margin:6px 0; }
 .sr-history-row .swipe_left, .sr-history-row .swipe_right,
 .sr-history-row .swipes-counter, .sr-history-row .mes_swipe_picker { display:none !important; }
-.sr-native-disabled { opacity:.35 !important; cursor:not-allowed !important; }
+.sr-native-disabled { display:none !important; }
 #sr-settings .sr-settings-title { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:36px; padding:6px 0; font-weight:600; cursor:pointer; list-style:none; }
 #sr-settings .sr-settings-title::-webkit-details-marker { display:none; }
 .sr-settings-chevron { width:9px; height:9px; margin:0 6px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); opacity:.7; }

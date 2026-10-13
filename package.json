@@ -1,6 +1,6 @@
 {
   "name": "st-sr",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "private": true,
   "scripts": {
     "test": "node --experimental-vm-modules --test tests/*.mjs && node tests/history-dom.cjs"
