@@ -91,3 +91,13 @@ test('unsupported group and user-message targets reject before mutation', () => 
     c.groupId = null; c.chat[1].is_user = true; assert.throws(() => begin(c));
     assert.equal(c.chat.length, 2);
 });
+test('each candidate keeps its own translation, including updated selected translation', () => {
+    const old = { ...message('original B'), swipes: ['original A', 'original B'], swipe_id: 1,
+        swipe_info: [{ extra: { display_text: '번역 A' } }, { extra: { display_text: '이전 번역 B' } }],
+        extra: { display_text: '수정 번역 B', reasoning_display_text: '번역된 추론 B' } };
+    const fresh = { ...message('original C'), extra: { display_text: '번역 C' } };
+    merge(old, fresh);
+    assert.deepEqual(fresh.swipe_info.map(x => x.extra.display_text), ['번역 A', '수정 번역 B', '번역 C']);
+    assert.equal(fresh.swipe_info[1].extra.reasoning_display_text, '번역된 추론 B');
+    assert.equal(fresh.mes, 'original C');
+});

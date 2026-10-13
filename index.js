@@ -1,6 +1,7 @@
 import * as ST from '../../../../script.js';
 import { getContext } from '../../../extensions.js';
 import { begin, finish } from './core.mjs';
+import { installHistoryViewer } from './history.js';
 
 const MENU_ID = 'option_regenerate_swipe';
 let busy = false;
@@ -117,6 +118,8 @@ if (typeof ST.setSendButtonState !== 'function' || typeof ST.redisplayChat !== '
     toastr.error('재생성(스와이프): 이 실리태번 버전에는 필요한 확장 API가 없습니다.');
 } else {
     installMenu();
+    installHistoryViewer({ getContext, format: ST.messageFormatting,
+        events: ST.eventSource, eventTypes: ST.event_types });
     const observer = new MutationObserver(installMenu);
     observer.observe(document.getElementById('options') || document.body, { childList: true, subtree: true });
 }
