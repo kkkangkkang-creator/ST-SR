@@ -3,7 +3,7 @@ import { getContext, extension_settings } from '../../../extensions.js';
 import { begin, finish } from './core.mjs';
 import { installHistoryViewer } from './history.js';
 import { renderPreviewJSR } from './render-bridge.mjs';
-import { installSettings, DISABLED_REGENERATE_ID } from './settings.mjs';
+import { installSettings, DISABLED_REGENERATE_ID } from './settings.mjs?v=1.1.4';
 
 const MENU_ID = 'option_regenerate_swipe';
 let busy = false;

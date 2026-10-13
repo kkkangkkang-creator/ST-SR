@@ -45,3 +45,25 @@ test('saved preference applies on initial load and newly rebuilt native menu', a
         assert.equal(document.querySelectorAll('#sr-settings').length, 1);
     } finally { dom.window.close(); }
 });
+
+test('replacement options container is blocked immediately and stays disabled after id reset', async () => {
+    const dom = new JSDOM('<div id="extensions_settings"></div><div id="options"><a id="option_regenerate">Regenerate</a></div>');
+    try {
+        const document = dom.window.document;
+        installSettings({ document, settings: { ST_SR: { disableNativeRegenerate: true } }, save() {} });
+        document.getElementById('options').outerHTML = '<div id="options"><a id="option_regenerate"><span>Regenerate</span></a></div>';
+        let calls = 0;
+        const native = document.getElementById('option_regenerate');
+        native.addEventListener('click', () => calls++);
+        native.firstChild.click();
+        assert.equal(calls, 0);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        assert.equal(native.id, DISABLED_REGENERATE_ID);
+        native.id = 'option_regenerate';
+        await new Promise(resolve => setTimeout(resolve, 0));
+        assert.equal(native.id, DISABLED_REGENERATE_ID);
+        document.querySelector('.sr-native-toggle').click();
+        native.firstChild.click();
+        assert.equal(calls, 1);
+    } finally { dom.window.close(); }
+});
