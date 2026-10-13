@@ -1,8 +1,9 @@
 import * as ST from '../../../../script.js';
-import { getContext } from '../../../extensions.js';
+import { getContext, extension_settings } from '../../../extensions.js';
 import { begin, finish } from './core.mjs';
 import { installHistoryViewer } from './history.js';
 import { renderPreviewJSR } from './render-bridge.mjs';
+import { installSettings, DISABLED_REGENERATE_ID } from './settings.mjs';
 
 const MENU_ID = 'option_regenerate_swipe';
 let busy = false;
@@ -70,9 +71,19 @@ async function run() {
                 getContext().characterId !== transaction.character) {
                 throw new Error('저장 중 채팅이 바뀌었습니다. 원본 보관본은 유지합니다.');
             }
-            // Re-render in memory; don't reload the saved chat or emit a synthetic swipe.
-            await ST.redisplayChat({ startIndex: transaction.index });
+            if (result === 'restored') {
+                // Only restoration replaces the displayed message. Notify renderers of
+                // the actual render, not a new generation or a synthetic swipe.
+                await ST.redisplayChat({ startIndex: transaction.index });
+                await ST.eventSource.emit(ST.event_types.CHARACTER_MESSAGE_RENDERED, transaction.index, 'regenerate');
+            } else {
+                // Native Generate already rendered this answer (including third-party
+                // iframes). Merging history changes only candidate indices, not its body.
+                const row = document.querySelector(`#chat > .mes[mesid="${transaction.index}"]`);
+                row?.setAttribute('swipeid', String(current.chat[transaction.index].swipe_id));
+            }
             ST.showSwipeButtons();
+            ST.refreshSwipeButtons(true, false);
         }
         recovery = null;
         if (result === 'restored') toastr.info('새 답변이 없어 기존 답변을 복원했습니다.');
@@ -88,10 +99,12 @@ async function run() {
 }
 
 function installMenu() {
-    const original = document.getElementById('option_regenerate');
+    const original = document.getElementById('option_regenerate') || document.getElementById(DISABLED_REGENERATE_ID);
     if (!original || document.getElementById(MENU_ID)) return;
     const item = original.cloneNode(false);
     item.id = MENU_ID;
+    item.classList.remove('sr-native-disabled');
+    item.removeAttribute('aria-disabled');
     item.removeAttribute('data-i18n');
     item.removeAttribute('onclick');
     item.title = '원래 재생성 방식으로 생성하고 이전 답변을 스와이프로 보관 (최대 50개)';
@@ -119,6 +132,7 @@ if (typeof ST.setSendButtonState !== 'function' || typeof ST.redisplayChat !== '
     toastr.error('재생성(스와이프): 이 실리태번 버전에는 필요한 확장 API가 없습니다.');
 } else {
     installMenu();
+    installSettings({ settings: extension_settings, save: ST.saveSettingsDebounced });
     installHistoryViewer({ getContext, format: ST.messageFormatting,
         events: ST.eventSource, eventTypes: ST.event_types, renderPreview: renderPreviewJSR });
     const observer = new MutationObserver(installMenu);
