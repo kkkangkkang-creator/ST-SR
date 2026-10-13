@@ -1,5 +1,5 @@
 // Read-only DOM viewer. Never assign chat.mes, swipe_id, swipes, or swipe_info.
-export function installHistoryViewer({ getContext, format, events, eventTypes }) {
+export function installHistoryViewer({ getContext, format, events, eventTypes, renderPreview }) {
     const root = document.getElementById('chat');
     if (!root) return;
     const views = new Map();
@@ -7,6 +7,8 @@ export function installHistoryViewer({ getContext, format, events, eventTypes })
     const icon = path => `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="${path}"/></svg>`;
 
     function reset(view) {
+        view.stopRendering?.();
+        view.stopRendering = null;
         view.position = view.selected;
         view.block.classList.remove('sr-history-active');
         view.preview.hidden = true;
@@ -22,6 +24,8 @@ export function installHistoryViewer({ getContext, format, events, eventTypes })
     }
 
     function show(view) {
+        view.stopRendering?.();
+        view.stopRendering = null;
         const { message, selected, position } = view;
         const alternate = position !== selected;
         view.label.textContent = alternate
@@ -50,6 +54,10 @@ export function installHistoryViewer({ getContext, format, events, eventTypes })
             view.preview.append(details);
         }
         view.preview.append(body);
+        if (renderPreview) {
+            try { view.stopRendering = renderPreview(body, view.messageId); }
+            catch (error) { console.warn('[ST-SR] Preview renderer unavailable', error); }
+        }
     }
 
     function create(row, message, selected, text) {
@@ -69,7 +77,7 @@ export function installHistoryViewer({ getContext, format, events, eventTypes })
         label.setAttribute('aria-live', 'polite');
         const preview = document.createElement('div');
         preview.className = 'sr-history-preview'; preview.hidden = true;
-        const view = { message, selected, position: selected, block, bar, preview,
+        const view = { message, messageId: Number(row.getAttribute('mesid')), selected, position: selected, block, bar, preview,
             previous, next, close, label, text, chosenText: message.mes, swipes: message.swipes,
             count: message.swipes.length };
         bar.append(previous, label, next, close);

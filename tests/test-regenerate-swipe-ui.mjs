@@ -45,7 +45,7 @@ async function setup(mode) {
         toastr: { error() {}, warning() {}, info() {} }, structuredClone, Blob, URL });
     const module = new vm.SourceTextModule(await fs.readFile(new URL('../index.js', import.meta.url), 'utf8'), { context: sandbox });
     await module.link(async spec => {
-        const exports = spec === '../../../../script.js' ? st : spec === '../../../extensions.js' ? { getContext: () => c } : spec === './history.js' ? { installHistoryViewer() {} } : core;
+        const exports = spec === '../../../../script.js' ? st : spec === '../../../extensions.js' ? { getContext: () => c } : spec === './history.js' ? { installHistoryViewer() {} } : spec === './render-bridge.mjs' ? { renderPreviewJSR() {} } : core;
         return new vm.SyntheticModule(Object.keys(exports), function () {
             for (const [key, value] of Object.entries(exports)) this.setExport(key, value);
         }, { context: sandbox });

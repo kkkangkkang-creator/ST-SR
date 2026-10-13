@@ -2,6 +2,7 @@ import * as ST from '../../../../script.js';
 import { getContext } from '../../../extensions.js';
 import { begin, finish } from './core.mjs';
 import { installHistoryViewer } from './history.js';
+import { renderPreviewJSR } from './render-bridge.mjs';
 
 const MENU_ID = 'option_regenerate_swipe';
 let busy = false;
@@ -119,7 +120,7 @@ if (typeof ST.setSendButtonState !== 'function' || typeof ST.redisplayChat !== '
 } else {
     installMenu();
     installHistoryViewer({ getContext, format: ST.messageFormatting,
-        events: ST.eventSource, eventTypes: ST.event_types });
+        events: ST.eventSource, eventTypes: ST.event_types, renderPreview: renderPreviewJSR });
     const observer = new MutationObserver(installMenu);
     observer.observe(document.getElementById('options') || document.body, { childList: true, subtree: true });
 }
