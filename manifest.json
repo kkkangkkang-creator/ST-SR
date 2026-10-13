@@ -1,0 +1,10 @@
+{
+    "display_name": "재생성(스와이프)",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "author": "kkkangkkang-creator",
+    "version": "1.0.0",
+    "homePage": "https://github.com/kkkangkkang-creator/ST-SR"
+}
