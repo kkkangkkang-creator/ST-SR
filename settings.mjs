@@ -30,7 +30,7 @@ export function installSettings({ settings, save, document: doc = globalThis.doc
             panel = doc.createElement('div');
             panel.id = 'sr-settings';
             panel.className = 'extension_container';
-            panel.innerHTML = '<div class="sr-settings-title">재생성(스와이프)</div><div class="sr-settings-row"><span>기존 재생성 버튼 비활성화</span><button type="button" role="switch" aria-label="기존 재생성 버튼 비활성화" class="menu_button sr-native-toggle"></button></div>';
+            panel.innerHTML = '<details class="sr-settings-drawer"><summary class="sr-settings-title"><span>재생성(스와이프)</span><span class="sr-settings-chevron" aria-hidden="true"></span></summary><div class="sr-settings-row"><span id="sr-native-toggle-label">기존 재생성 버튼 비활성화</span><button type="button" role="switch" aria-labelledby="sr-native-toggle-label" class="sr-native-toggle"><span class="sr-toggle-thumb" aria-hidden="true"></span></button></div></details>';
             panel.querySelector('button').addEventListener('click', () => {
                 preferences.disableNativeRegenerate = preferences.disableNativeRegenerate !== true;
                 save(); sync();
@@ -40,8 +40,6 @@ export function installSettings({ settings, save, document: doc = globalThis.doc
         const toggle = panel?.querySelector('button');
         if (toggle) {
             toggle.setAttribute('aria-checked', String(disabled));
-            const label = disabled ? '켜짐' : '꺼짐';
-            if (toggle.textContent !== label) toggle.textContent = label;
         }
     }
     sync();
